@@ -11,7 +11,7 @@ from torch.utils.data import IterableDataset
 
 class ObjectStorageDataset(IterableDataset):
 
-  def __init__(self, glob, batch_size = None, steps = None,  cache_dir = None, storage_options = None, fits_in_node_memory = True, fits_in_cluster_memory = True, worker = 0, replicas = 1):
+  def __init__(self, glob, batch_size = None, iterations = None,  cache_dir = None, storage_options = None, fits_in_node_memory = True, fits_in_cluster_memory = True, worker = 0, replicas = 1):
 
     self.glob = glob
 
@@ -66,16 +66,16 @@ class ObjectStorageDataset(IterableDataset):
 
     self.dataset_size = len(self.df)
     self.batch_size = batch_size if batch_size else self.dataset_size
-    self.steps = steps if steps else float('nan')
+    self.iterations = iterations if iterations else float('nan')
 
   def __iter__(self):
 
     idx = 0
 
-    while self.steps:
+    while self.iterations:
       df_range = np.arange(idx, idx + self.batch_size) % self.dataset_size
 
       yield pt.tensor(self.df.iloc[ df_range].values)
 
       idx = (idx + self.batch_size) % self.dataset_size
-      self.steps -= 1
+      self.iterations -= 1
